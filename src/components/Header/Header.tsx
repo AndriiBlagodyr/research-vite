@@ -1,7 +1,12 @@
-export default function Header() {
+type HeaderProps = {
+  name: string;
+};
+
+export default function Header({ name }: HeaderProps) {
   return (
-    <div>
-      Header: {import.meta.env.VITE_API_URL}
-    </div>
-  )
+    <>
+      <span>{name}</span>
+      <div>Header: {import.meta.env.VITE_API_URL} </div>
+    </>
+  );
 }
