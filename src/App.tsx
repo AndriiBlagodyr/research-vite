@@ -4,6 +4,7 @@ import LineChart from './pages/LineChart';
 import ScatterPlot from './pages/ScatterPlot';
 import Product from './pages/Product';
 import NotFound from './pages/NotFound';
+import BarChart from './pages/BarChart';
 
 export function App() {
   return (
@@ -12,6 +13,7 @@ export function App() {
       <Route path='/product' element={<Product />} />
       <Route path='/line-chart' element={<LineChart />} />
       <Route path='/scatter-plot' element={<ScatterPlot />} />
+      <Route path='/bar-chart' element={<BarChart />} />
       <Route path='*' element={<NotFound />} />
     </Routes>
   );
