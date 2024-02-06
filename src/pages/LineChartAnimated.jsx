@@ -2,25 +2,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-
 import chartData from '../chart-data/my_weather_data.json';
-import './styles.css';
 
-function LineChart() {
+function LineChartAnimated() {
   const [data, setData] = useState(chartData);
   const svgRef = useRef();
 
   useEffect(() => {
-    d3.selectAll('svg > *').remove();
     async function drawLineChart() {
+      // 2. Create chart dimensions
+
       const yAccessor = (d) => d.temperatureMax;
       const dateParser = d3.timeParse('%Y-%m-%d');
       const xAccessor = (d) => dateParser(d.date);
-
       let dataset = data
         .sort((a, b) => xAccessor(a) - xAccessor(b))
         .slice(0, 100);
-      // 2. Create chart dimensions
 
       const dimensions = {
         width: window.innerWidth * 0.9,
@@ -51,7 +48,7 @@ function LineChart() {
           `translate(${dimensions.margin.left}px, ${dimensions.margin.top}px)`
         );
 
-      const clipPath = bounds
+      bounds
         .append('defs')
         .append('clipPath')
         .attr('id', 'bounds-clip-path')
@@ -61,13 +58,10 @@ function LineChart() {
 
       // init static elements
       bounds.append('rect').attr('class', 'freezing');
-
       const clip = bounds
         .append('g')
         .attr('clip-path', 'url(#bounds-clip-path)');
-
       clip.append('path').attr('class', 'line');
-
       bounds
         .append('g')
         .attr('class', 'x-axis')
@@ -79,9 +73,8 @@ function LineChart() {
 
         const yScale = d3
           .scaleLinear()
-          .domain(d3.extent(dataset, yAccessor)) // min and max data values
+          .domain(d3.extent(dataset, yAccessor))
           .range([dimensions.boundedHeight, 0]);
-        // to test return value of yScale - call yScale(number). Return value - is the number of pixels from the top
 
         const freezingTemperaturePlacement = yScale(32);
         const freezingTemperatures = bounds
@@ -144,12 +137,12 @@ function LineChart() {
         };
       }
 
-      // update the line every 1.5 seconds
       function addNewDay() {
         dataset = [...dataset.slice(1), generateNewDataPoint(dataset)];
         drawLine(dataset);
       }
-      setInterval(addNewDay, 1500);
+      // update the line every 1.5 seconds
+      // setInterval(addNewDay, 1500);
     }
     drawLineChart();
   }, [data]);
@@ -164,4 +157,4 @@ function LineChart() {
   );
 }
 
-export default LineChart;
+export default LineChartAnimated;

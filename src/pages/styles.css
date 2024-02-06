@@ -56,3 +56,18 @@ button:active {
     box-shadow: 0 1px 0 0 seagreen;
     transform: translateY(4px);
 }
+
+.freezing {
+    fill: #e0f3f3;
+}
+
+.line {
+    fill: none;
+    stroke: #af9358;
+    stroke-width: 2;
+}
+.x-axis-label {
+    fill: black;
+    font-size: 1.4em;
+    text-transform: capitalize;
+}
