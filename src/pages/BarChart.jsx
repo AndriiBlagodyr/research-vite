@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import * as d3 from 'd3';
@@ -21,7 +22,8 @@ function BarChart() {
   const svgRef = useRef();
 
   useEffect(() => {
-    d3.selectAll('svg > *').remove();
+    // d3.selectAll('svg > *').remove();
+    // d3.select('#wrapper').selectAll('*').remove();
     async function drawBars() {
       // 1. Access data
       const dataset = chartData;
@@ -45,9 +47,9 @@ function BarChart() {
         dimensions.height - dimensions.margin.top - dimensions.margin.bottom;
 
       // 3. Draw canvas
-
       const wrapper = d3
-        .select(svgRef.current)
+        .select('#wrapper')
+        .append('svg')
         .attr('width', dimensions.width)
         .attr('height', dimensions.height);
 
@@ -182,7 +184,50 @@ function BarChart() {
           .transition(updateTransition)
           .call(xAxisGenerator);
 
-        const xAxisLabel = xAxis.select('.x-axis-label').text(metric);
+        const xAxisLabel = xAxis
+          .select('.x-axis-label')
+          .attr('x', dimensions.boundedWidth / 2)
+          .attr('y', dimensions.margin.bottom - 10)
+          .text('Humidity');
+
+        // 7. Set up interactions
+
+        binGroups
+          .select('rect')
+          .on('mouseenter', onMouseEnter)
+          .on('mouseleave', onMouseLeave);
+
+        const tooltip = d3.select('#tooltip');
+        function onMouseEnter(e, datum) {
+          tooltip.select('#count').text(yAccessor(datum));
+
+          const formatHumidity = d3.format('.2f');
+          tooltip
+            .select('#range')
+            .text(
+              [formatHumidity(datum.x0), formatHumidity(datum.x1)].join(' - ')
+            );
+
+          const x =
+            xScale(datum.x0) +
+            (xScale(datum.x1) - xScale(datum.x0)) / 2 +
+            dimensions.margin.left;
+          const y = yScale(yAccessor(datum)) + dimensions.margin.top;
+
+          tooltip.style(
+            'transform',
+            `translate(` +
+              `calc( -50% + ${x}px),` +
+              `calc(-100% + ${y}px)` +
+              `)`
+          );
+
+          tooltip.style('opacity', 1);
+        }
+
+        function onMouseLeave() {
+          tooltip.style('opacity', 0);
+        }
       };
 
       let selectedMetricIndex = 0;
@@ -204,8 +249,16 @@ function BarChart() {
   return (
     <div>
       <h2>Line Charts</h2>
-      <div>
-        <svg ref={svgRef} style={{ margin: '100px', display: 'block' }} />
+      <div id='wrapper' className='wrapper'>
+        {/* <svg ref={svgRef} /> */}
+        <div id='tooltip' className='tooltip'>
+          <div className='tooltip-range'>
+            Humidity: <span id='range' />
+          </div>
+          <div className='tooltip-value'>
+            <span id='count' /> days
+          </div>
+        </div>
       </div>
     </div>
   );
